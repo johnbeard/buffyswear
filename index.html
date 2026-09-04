@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Buffy's Swearing Keyboard</title>
+    <meta
+      name="description"
+      content="An HTML5 remake of the classic b3ta 'Buffy's Swearing Keyboard' Flash toy. Type on your keyboard to make Buffy swear."
+    />
+    <meta name="theme-color" content="#e9e6df" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script type="module" src="js/app.js"></script>
+  </head>
+  <body>
+    <main class="page">
+      <h1 class="visually-hidden">Buffy's Swearing Keyboard</h1>
+
+      <section class="stage" id="stage" aria-label="Buffy's Swearing Keyboard, press letter keys to make her swear">
+        <img
+          class="stage__layer stage__layer--background"
+          src="static/images/background.png"
+          width="508"
+          height="430"
+          alt=""
+        />
+        <!-- Word and mouth overlays are injected by js/app.js. -->
+      </section>
+
+      <div class="queue-bar">
+        <label class="queue-bar__toggle">
+          <input type="checkbox" id="useSwearQueue" />
+          <span>use swearqueue</span>
+        </label>
+        <input
+          class="queue-bar__text"
+          id="queueText"
+          type="text"
+          inputmode="latin"
+          autocomplete="off"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+          enterkeyhint="done"
+          aria-label="Queue: type letters, they play as you go"
+          placeholder="type to queue"
+          hidden
+          disabled
+        />
+        <span
+          class="queue-bar__status visually-hidden"
+          id="queueStatus"
+          role="status"
+          aria-live="polite"
+        ></span>
+      </div>
+
+      <p class="hint" id="hint">Cobbled together with love in memory of simpler times. Copyright (C) (TM) and all that, b3ta, Joel Veitch and Rob Manuel.</p>
+      <p class="hint" id="hint">See the original at <a href="https://www2.b3ta.com/buffyswear/" target="_blank" rel="noopener">b3ta.com/buffyswear</a></p>
+      <p class="hint" id="hint">Issues, complaints, hamster-related manifestoes: <a href="https://github.com/johnbeard/buffyswear/" target="_blank" rel="noopener">GitHub</a></p>
+    </main>
+  </body>
+</html>

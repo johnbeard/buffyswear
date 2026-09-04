@@ -1,0 +1,248 @@
+/* Buffy's Swearing Keyboard - modern HTML5 remake
+   Layout values match the original Flash stage (507x429 px, exported here as a
+   508x430 canvas). All overlay geometry is expressed as percentages of the
+   stage so it scales perfectly with the container's aspect ratio. */
+
+:root {
+  --bg-page: #e9e6df;
+  --bg-card: #fffdf7;
+  --ink: #2b2b28;
+  --ink-muted: #6f6c64;
+  --accent: #a4312b;
+  --stage-width: min(96vw, calc((100dvh - 10.5rem) * 1.1814), 1500px);
+  --hit-radius: 0.32rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: var(--bg-page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem 1.1rem;
+}
+
+/* ---- Stage ---- */
+
+.stage {
+  position: relative;
+  width: var(--stage-width);
+  aspect-ratio: 508 / 430;
+  border-radius: 0.65rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(45, 40, 30, 0.22),
+    0 2px 8px rgba(45, 40, 30, 0.14);
+  /* The stage is a passive toy; clicking inside it must not steal focus in a
+     way that breaks keyboard input, but we keep default behaviour simple. */
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.stage__layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.stage__layer--word,
+.stage__layer--mouth {
+  display: none;
+}
+
+.stage__layer.is-active {
+  display: block;
+}
+
+/* ---- Hint ---- */
+
+.hint {
+  margin: 0;
+  max-width: var(--stage-width);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+}
+
+/* ---- Swear queue bar ---- */
+
+.queue-bar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem 0.9rem;
+  width: min(96vw, var(--stage-width));
+  padding: 0.35rem 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid #e2ddd2;
+  border-radius: 0.65rem;
+  box-shadow: 0 2px 10px rgba(45, 40, 30, 0.08);
+  font-size: 0.92rem;
+}
+
+.queue-bar__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.queue-bar__toggle input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* The composer is a real text input so the device's own text engine
+   (predictive text, swipe, autocorrect) works normally. It is shown only in
+   queue mode (the hidden/disabled attributes are toggled from app.js). No
+   display property is set here so the [hidden] attribute keeps working. */
+.queue-bar__text {
+  min-width: 8rem;
+  flex: 1 1 10rem;
+  max-width: 26rem;
+  padding: 0.25rem 0.6rem;
+  font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  color: var(--ink, #2a2620);
+  background: #fbf8f1;
+  border: 1px solid #e2ddd2;
+  border-radius: 0.4rem;
+}
+
+.queue-bar__text:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.queue-bar__text::placeholder {
+  font-style: italic;
+  letter-spacing: 0;
+  color: var(--ink-muted);
+}
+
+.queue-bar__text:disabled {
+  opacity: 0.6;
+}
+
+/* ---- Clickable key hotspots over the artwork ---- */
+
+.key-hotspot {
+  position: absolute;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: var(--hit-radius);
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hover feedback only where a real pointer can hover. On touch devices the
+   browser keeps the last-tapped element in :hover until another tap, which
+   would leave the key lit after the finger lifts. */
+@media (hover: hover) and (pointer: fine) {
+  .key-hotspot:hover {
+    background: rgba(255, 255, 255, 0.28);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  }
+}
+
+.key-hotspot:active,
+.key-hotspot.is-held {
+  background: rgba(60, 60, 70, 0.28);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.key-hotspot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ---- Decorative indicator LEDs on the keyboard bezel ---- */
+
+.led {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 35% 35%,
+    #ffb3a7,
+    #e0352b 55%,
+    #8f1c14
+  );
+  box-shadow: 0 0 2px 1px rgba(224, 53, 43, 0.55);
+  opacity: 0;
+}
+
+.led.is-on {
+  opacity: 1;
+}
+
+/* ---- "0" key: red lens-flare bursts over Buffy's eyes ---- */
+
+.eye-flare {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: none;
+  pointer-events: none;
+}
+
+.eye-flare.is-active {
+  display: block;
+}
+
+.eye-flare__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ---- Accessibility helpers ---- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
